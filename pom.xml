@@ -12,7 +12,7 @@
 		<mybatis.spring.version>1.2.2</mybatis.spring.version>
 	</properties>
 	<dependencies>
-		<!-- acitiviti的jar的包 -->
+		<!-- acitiviti的jar的包在哪里 -->
 		<dependency>
 			<groupId>org.activiti</groupId>
 			<artifactId>activiti-engine</artifactId>
