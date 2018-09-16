@@ -1,0 +1,73 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/tx 
+                        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- <context:component-scan base-package="" /> -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/activiti_01" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+		<property name="defaultAutoCommit" value="false" />
+	</bean>
+
+	<!-- 使用jndi数据源 -->
+	<!-- <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> 
+		<property name="jndiName" value="java:comp/env/jdbc/activitiDB" /> </bean> -->
+
+
+	<bean id="processEngineConfiguration"
+		class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+		<property name="dataSource" ref="dataSource" />
+		<!-- <property name="jobExecutorActivate" value="false" /> -->  <!-- 开启job -->
+		<property name="databaseSchemaUpdate" value="true" />
+
+
+		<!-- 自定义缓存实现 -->
+		<!-- <property name="processDefinitionCache"> <bean class="org.activiti.MyCache" 
+			/> </property> <property name="processDefinitionCacheLimit" value="10" /> -->
+
+
+        <!-- 监听        RuntimeService可以在运行阶段添加或删除额外的事件监听器-->
+		<property name="eventListeners">
+			<list>
+				<bean class="com.px.listener.MyEventListener" />
+			</list>
+		</property>
+
+		<property name="typedEventListeners"> <!-- 监听特定事件 -->
+			<map>
+				<entry key="JOB_EXECUTION_SUCCESS,JOB_EXECUTION_FAILURE">
+					<list>
+						<bean class="com.px.listener.MyEventListener" />
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+
+	<!-- 配置一个流程引擎配置对象 -->
+	<!-- <bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration"> 
+		<property name="jdbcDriver" value="com.mysql.jdbc.Driver"></property> <property 
+		name="jdbcUrl" value="jdbc:mysql://localhost:3306/activiti_01"></property> 
+		<property name="jdbcUsername" value="root"></property> <property name="jdbcPassword" 
+		value="root"></property> <property name="databaseSchemaUpdate" value="true"></property> 
+		</bean> -->
+
+
+	<!-- 配置一个流程引擎工厂bean，用于创建流程引擎对象 -->
+	<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+		<property name="processEngineConfiguration" ref="processEngineConfiguration"></property>
+	</bean>
+
+
+
+
+</beans>
